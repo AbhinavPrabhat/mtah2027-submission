@@ -95,7 +95,18 @@ The learned parts never replace the rules. They correct a rule where the rule is
 frames the rules leave open. Each learned part checks itself against the algorithm's own anchors and falls
 back to the classical rule when a check fails.
 
-![Pipeline overview](figures/pipeline_overview.png)
+```mermaid
+flowchart LR
+    A[ATD tracking<br/>ball + 22 players] --> B[Gap fill<br/>short ball gaps]
+    B --> C[Touch detector]
+    B --> D[Dead-ball flow]
+    C --> D
+    C --> E[Possession flow]
+    D -->|dead mask +<br/>restart teams| E
+    E --> F[Post-processor<br/>blip filter]
+    D --> F
+    F --> G[Labels H / A / D]
+```
 
 What goes in: the ATD (ball and player positions and speeds), and the Smart Tagging file. Smart Tags are used
 only as a label that says "a throw-in / corner / goal kick / kickoff happened around here". Their start
@@ -115,7 +126,24 @@ and end times and their team field are never used. Every boundary comes from the
 
 ### 2.3 Dead-ball flow
 
-![Dead-ball flow](figures/dead_ball_flow.png)
+```mermaid
+flowchart TB
+    subgraph classical[Classical: rules on the tracking]
+        K[Kickoff<br/>whistle to centre-spot strike]
+        S[Set pieces: throw-in, corner, goal kick<br/>exit trigger to restart strike]
+    end
+    subgraph learned[Learned: everything else]
+        AN[Anchors<br/>frames the tracking proves dead or live]
+        EV[Evidence<br/>LightGBM + HMM + GRU]
+        DEC[Viterbi decode<br/>one continuous dead/live path]
+        AN --> DEC
+        EV --> DEC
+    end
+    K --> M[Dead mask + restart teams]
+    S --> M
+    DEC --> M
+    M -->|set-piece segments win<br/>inside themselves| OUT[Dead frames]
+```
 
 **Classical part** (`dead_ball.py`, `restart_triggers.py`, `kickoff_detector.py`)
 
@@ -180,7 +208,30 @@ is the players slowing and standing together.
 
 ### 2.4 Possession flow
 
-![Possession flow](figures/possession_flow.png)
+```mermaid
+flowchart TB
+    subgraph classical[Classical: touch logic]
+        T[Credited touches]
+        C[Confirm changes<br/>chain / carry / no deflection]
+        R[Restart team at each restart]
+        T --> C
+        R --> C
+        C --> L0[Rule labels]
+    end
+    subgraph learned[Learned: fix and fill]
+        CL[Clean labels<br/>clear touches and passes]
+        M[LightGBM + GRU<br/>P Home per frame]
+        FX[Touch fix<br/>flip weak touches the model<br/>is 82% sure about]
+        DC[Decode with a change<br/>budget from the touches]
+        CL --> M
+        M --> FX
+        M --> DC
+    end
+    T --> FX
+    FX -->|corrected touches| C
+    L0 -->|vote +-2| DC
+    DC --> OUT[H / A on live frames]
+```
 
 **Classical part** (`touch_detector.py`, `control.py`, `assemble.py`)
 
