@@ -1,0 +1,4 @@
+-r requirements-solution.txt
+scipy==1.18.1
+hmmlearn==0.3.3
+torch==2.15.0

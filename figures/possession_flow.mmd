@@ -1,0 +1,22 @@
+flowchart TB
+    subgraph classical[Classical: touch logic]
+        T[Credited touches]
+        C[Confirm changes<br/>chain / carry / no deflection]
+        R[Restart team at each restart]
+        T --> C
+        R --> C
+        C --> L0[Rule labels]
+    end
+    subgraph learned[Learned: fix and fill]
+        CL[Clean labels<br/>clear touches and passes]
+        M[LightGBM + GRU<br/>P Home per frame]
+        FX[Touch fix<br/>flip weak touches the model<br/>is 82% sure about]
+        DC[Decode with a change<br/>budget from the touches]
+        CL --> M
+        M --> FX
+        M --> DC
+    end
+    T --> FX
+    FX -->|corrected touches| C
+    L0 -->|vote +-2| DC
+    DC --> OUT[H / A on live frames]

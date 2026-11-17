@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph classical[Classical: rules on the tracking]
+        K[Kickoff<br/>whistle to centre-spot strike]
+        S[Set pieces: throw-in, corner, goal kick<br/>exit trigger to restart strike]
+    end
+    subgraph learned[Learned: everything else]
+        AN[Anchors<br/>frames the tracking proves dead or live]
+        EV[Evidence<br/>LightGBM + HMM + GRU]
+        DEC[Viterbi decode<br/>one continuous dead/live path]
+        AN --> DEC
+        EV --> DEC
+    end
+    K --> M[Dead mask + restart teams]
+    S --> M
+    DEC --> M
+    M -->|set-piece segments win<br/>inside themselves| OUT[Dead frames]
