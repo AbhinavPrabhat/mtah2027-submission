@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "trained_on": "BAR-ATH",
+  "checks": {
+    "min_dead_anchors": 1500,
+    "min_live_anchors": 5000,
+    "min_clean_auc": 0.85,
+    "min_hmm_auc": 0.75,
+    "min_gru_auc": 0.8,
+    "dead_share": [
+      0.2,
+      0.6
+    ]
+  },
+  "stopped_reference": "w100_mean_all_spd_mean",
+  "anchors": {
+    "dead": 6240,
+    "live": 55614
+  },
+  "numbers_at_training": {
+    "clean_auc": 0.942,
+    "hmm_auc": 0.872,
+    "gru_auc": 0.925,
+    "pseudo_dead": 35186,
+    "pseudo_live": 29333,
+    "gru": {
+      "oof_auc": 0.925,
+      "train_loss": 0.568,
+      "val_loss": 0.649,
+      "parameters": 13569
+    }
+  },
+  "libraries": {
+    "numpy": "2.5.4",
+    "scikit_learn": "1.9.1",
+    "lightgbm": "4.7.0"
+  }
+}
