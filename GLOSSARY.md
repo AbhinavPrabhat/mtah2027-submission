@@ -33,22 +33,22 @@ A moment where a player kicks, heads or otherwise changes the ball's motion. We 
 the ball's direction or speed.
 
 ## Toucher and credited touch
-The toucher is the nearest player to the ball at the moment of the touch, but only if that player is within
-3.5 m. A touch with a toucher has a team, and we call it a credited touch. A touch with no player near enough has
+The toucher is the nearest player to the ball at the moment of the touch, but only if that player is close
+enough. A touch with a toucher has a team, and we call it a credited touch. A touch with no player near enough has
 no team and never changes possession.
 
 ## Clear touch and weak touch
-A touch is **clear** when the toucher is within 1.5 m of the ball and no opponent is within 3 m. Anything else is
-**weak**: the toucher was far, or an opponent was close, so the team that touched it is uncertain.
+A touch is **clear** when the toucher is right at the ball and no opponent is close. Anything else is **weak**: the
+toucher was far, or an opponent was near, so which team touched it is uncertain.
 
 ## Touch fix
-The step where the model checks each weak touch. If the model is at least 82% sure the other team had the ball, the
-touch is flipped to that team. The rule-based logic then runs again on the corrected touches.
+The step where the model checks each weak touch. If the model is very sure the other team had the ball, the touch is
+flipped to that team. The rule-based logic then runs again on the corrected touches.
 
 ## Chain, carry, deflection
 How the rule-based logic decides that an opponent's touch really changes possession.
-- **Chain**: within 2 s the same player touches the ball again, or the ball goes to a teammate of that player.
-- **Carry**: no other touch follows in a short window and the same player stays with the ball.
+- **Chain**: soon after, the same player touches the ball again, or the ball goes to a teammate of that player.
+- **Carry**: no other touch follows and the same player stays with the ball.
 - **Deflection**: the original team touches the ball again before the opponent does anything with it, so
   nothing changes.
 
@@ -59,12 +59,11 @@ with that team.
 ## Dead-ball terms
 
 ## Exit trigger
-The ball is seen more than 0.5 m past a line for at least three frames. This starts a throw-in, corner or goal
+The ball is seen clearly past a line for a few frames. This starts a throw-in, corner or goal
 kick.
 
 ## Restart strike
-The ball sits still at the spot the laws require and is then struck, travels at least 5 m and stays on the pitch.
-This ends the stoppage.
+The ball sits still at the spot the laws require and is then struck and really leaves. This ends the stoppage.
 
 ## Calm run
 A stretch in which the players' median speed stays low together. It is the sign of a stoppage with no ball exit,
@@ -72,12 +71,12 @@ such as a foul. It is also used as the rule-based fallback.
 
 ## Anchors
 Frames that the ball track and the touches prove to be dead or live, for example the wait between an exit and its
-restart strike, or four seconds of a ball being passed around. They are the training labels for the dead-ball
+restart strike, or a few seconds of a ball being passed around. They are the training labels for the dead-ball
 models.
 
 ## Clean labels
 Frames where the tracking itself makes clear who has the ball: near a clear touch, or between two clear touches
-of the same team. About 21% of live frames get a clean label. They are the training labels for the possession
+of the same team. About a fifth of live frames get a clean label. They are the training labels for the possession
 models.
 
 ## Models and training
@@ -91,7 +90,7 @@ A hidden Markov model: a small model with two hidden states (stopped, moving) th
 the players move, with no labels at all.
 
 ## GRU
-A small neural network that reads a sequence of frames (here 48 seconds) instead of one frame, so it can use what
+A small neural network that reads a sequence of frames (here a long window) instead of one frame, so it can use what
 happened before and after.
 
 ## Window features
@@ -104,7 +103,7 @@ agree with the rules, as well as on the clean labels.
 
 ## Cross-fitting and out-of-fold scores
 The match is cut into 2-minute blocks. Each block is scored by a model that was trained on the other blocks, with
-a gap of 10 s around the held-out block. Every frame therefore gets a score from a model that never saw it. See
+a gap left around the held-out block. Every frame therefore gets a score from a model that never saw it. See
 section 3.4 of the document.
 
 ## ROC AUC
@@ -125,7 +124,7 @@ A check that the learned part runs against this match's own anchors or clean lab
 logic is used instead.
 
 ## Blip filter
-The final step. A short live stretch (under 5 s) between two dead spells is turned into dead, unless play is
+The final step. A short live stretch between two dead spells is turned into dead, unless play is
 clearly visible inside it.
 
 ## Scores
