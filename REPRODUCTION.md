@@ -58,9 +58,3 @@ Every random seed is fixed, so a rerun gives the same models.
 The training scripts **overwrite the files in `solution/models/`** and clear `solution/cache/`, so part A
 picks up the new models with no other change. To get the shipped models back, run
 `git checkout solution/models`.
-
-Expected result: the retrained models match the shipped ones (the only difference is floating-point noise
-of about 1e-11 in `hmm.npz`), and the new `TikiTech.csv` is identical to the one from part A. This was
-checked with the pinned requirements.
-
-`solution/cache/` holds speed-up files made during a run. It is safe to delete.
