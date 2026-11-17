@@ -1,6 +1,6 @@
-# Possession and dead-ball labelling from tracking data
+# Technical Document: Possession and Dead-Ball Labelling from Tracking Data
 
-Technical document. Terms written like [this](GLOSSARY.md) are explained in the [glossary](GLOSSARY.md).
+*Terms written like [this](GLOSSARY.md) are explained in the [glossary](GLOSSARY.md).*
 
 ## Abstract
 
