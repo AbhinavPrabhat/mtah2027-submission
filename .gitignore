@@ -62,3 +62,6 @@ __pycache__/
 venv/
 env/
 .DS_Store
+
+# -- derived speed-up files, rebuilt on the first run ----------------------------------------
+solution/cache/
